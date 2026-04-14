@@ -1,0 +1,12 @@
+{
+	"folders": [
+		{
+			"path": "../../nixie proto"
+		},
+		{
+			"name": "esp32mic",
+			"path": ".."
+		}
+	],
+	"settings": {}
+}

@@ -1,0 +1,12 @@
+{
+	"folders": [
+		{
+			"path": "D:/Whisper/whisper/whisper-server"
+		},
+		{
+			"name": "esp32MIC",
+			"path": ".."
+		}
+	],
+	"settings": {}
+}
