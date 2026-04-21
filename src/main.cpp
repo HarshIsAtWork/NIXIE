@@ -8,6 +8,7 @@
 #include "display_manager.h"
 #include "wav_server.h"
 #include "tasks.h"
+#include "led_manager.h"
 
 enum class AppState { Idle, Recording, Ready, Error };
 static AppState appState = AppState::Idle;
@@ -95,6 +96,7 @@ void setup() {
   delay(100);
 
   displayInit();
+  ledInit();
   pinMode(BUZZER_PIN, OUTPUT);
   digitalWrite(BUZZER_PIN, LOW);
   displayBootAnimation();
@@ -129,6 +131,7 @@ void setup() {
 
 void loop() {
   wavServerHandleClients();
+  ledUpdate();
 
   buttonUpdate();
 

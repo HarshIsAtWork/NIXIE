@@ -8,7 +8,7 @@ constexpr const char* WIFI_PASS = "12345678";
 
 // Whisper server endpoint (configure to a reachable URL on your network)
 // Example: "http://192.168.1.100:8080/transcribe"
-constexpr const char* WHISPER_SERVER_URL = "http://10.252.126.134:8080/transcribe";
+constexpr const char* WHISPER_SERVER_URL = "http://10.252.126.110:8080/transcribe";
 
 // I2S mic (INMP441 typical pins for ESP32-S3)
 constexpr int I2S_PORT = 0;
@@ -55,4 +55,9 @@ constexpr int MAX_AUDIO_SAMPLES = SAMPLE_RATE * 30;
 constexpr int MIC_NOISE_FLOOR = 3000;
 
 constexpr int HTTP_SERVER_PORT = 8080;
+
+// Addressable LEDs. Change LED_PIN/LED_COUNT to match your strip if needed.
+constexpr int LED_PIN = 5;
+constexpr int LED_COUNT = 57;
+constexpr int LED_BRIGHTNESS = 200;
 

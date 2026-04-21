@@ -200,8 +200,8 @@ void displayOledShowTimer(int totalSeconds) {
   display.setTextColor(SSD1306_WHITE);
   display.setCursor(10, 20); // Center-ish
 
-  char buf[9];
-  snprintf(buf, sizeof(buf), "%02d:%02d:%02d", hours, minutes, seconds);
+  char buf[16];
+  snprintf(buf, sizeof(buf), "%02u:%02u:%02u", (unsigned)hours, (unsigned)minutes, (unsigned)seconds);
   display.println(buf);
   display.display();
 }
