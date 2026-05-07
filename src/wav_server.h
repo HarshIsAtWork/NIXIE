@@ -16,4 +16,6 @@ bool wavServerIsRunning();
 void wavServerHandleClients();
 void wavServerSetAudioBuffer(int16_t* buffer, int sampleCount);
 void wavServerSetCallbacks(StartRecordCallback startCb, StopRecordCallback stopCb, IsRecordingCallback isRecordingCb, GetMetaJsonCallback metaCb, ProcessCommandCallback procCmdCb, SetTimerCallback timerCb);
+void wavServerRequestTranscription();
+void wavServerProcessPending();
 void wavServerAutoTranscribe();

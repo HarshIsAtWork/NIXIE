@@ -6,9 +6,9 @@
 constexpr const char* WIFI_SSID = "harsha";
 constexpr const char* WIFI_PASS = "12345678";
 
-// Whisper server endpoint (configure to a reachable URL on your network)
-// Example: "http://192.168.1.100:8080/transcribe"
-constexpr const char* WHISPER_SERVER_URL = "http://10.252.126.110:8080/transcribe";
+// Whisper server endpoint on the development PC.
+// Use the LAN IP so the ESP32 can reach it reliably over Wi-Fi.
+constexpr const char* WHISPER_SERVER_URL = "http://10.56.205.134:8080/transcribe";
 
 // I2S mic (INMP441 typical pins for ESP32-S3)
 constexpr int I2S_PORT = 0;
@@ -16,25 +16,33 @@ constexpr int I2S_WS_PIN = 5;
 constexpr int I2S_SCK_PIN = 4;
 constexpr int I2S_SD_PIN = 6;
 
-// I2S output (MAX98357A, separate I2S port to avoid sharing one-way mic path)
-constexpr int I2S_OUT_PORT = 1;
-constexpr int I2S_OUT_WS_PIN = 17;
-constexpr int I2S_OUT_SCK_PIN = 16;
-constexpr int I2S_OUT_SD_PIN = 18;
-constexpr int I2S_OUT_SAMPLE_BITS = 16;
-
-// INMP441 capture on this hardware is actually running at 8000 Hz (matches measured wall clock).
-// Set to 8000 so WAV playback speed is real-time.
-constexpr int SAMPLE_RATE = 8000;
+constexpr int SAMPLE_RATE = 16000;
 constexpr int I2S_SAMPLE_BITS = 32;
 
 // Button (do not use pin 0 due to boot/download conflict)
-constexpr int BUTTON_PIN = 15;
+constexpr int BUTTON_PIN = 17; // physical pushbutton for recording
 
-// OLED (0.96 inch SSD1306 I2C default pins)
-constexpr int OLED_SDA = 8;
-constexpr int OLED_SCL = 9;
-constexpr int OLED_ADDR = 0x3C;
+// Rotary encoder for menu navigation. Wire CLK/DT/SW to these pins and GND.
+// Note: GPIO2 is a boot strapping pin, so we use GPIO19 for the button instead
+
+
+// Analog joystick pins (if present)
+constexpr int JOYSTICK_VRX_PIN = 1;
+constexpr int JOYSTICK_VRY_PIN = 2;
+constexpr int JOYSTICK_SW_PIN = 19;
+constexpr int JOYSTICK_DEBOUNCE_MS = 50;
+constexpr int JOYSTICK_THRESHOLD = 900;
+constexpr int JOYSTICK_CENTER = 512;
+
+// 2.4 inch SPI TFT, usually ILI9341, wired in landscape mode.
+// Touch pins are intentionally unused because this module's touch is unreliable.
+constexpr int TFT_SCK_PIN = 12;
+constexpr int TFT_MOSI_PIN = 11;
+constexpr int TFT_MISO_PIN = 13;
+constexpr int TFT_CS_PIN = 10;
+constexpr int TFT_DC_PIN = 14;
+constexpr int TFT_RESET_PIN = 21;
+constexpr int TFT_LED_PIN = 7;
 
 // 4-digit 7-seg backpack (HT16K33) I2C address
 constexpr int SEVEN_SEG_I2C_ADDR = 0x70;
@@ -55,9 +63,3 @@ constexpr int MAX_AUDIO_SAMPLES = SAMPLE_RATE * 30;
 constexpr int MIC_NOISE_FLOOR = 3000;
 
 constexpr int HTTP_SERVER_PORT = 8080;
-
-// Addressable LEDs. Change LED_PIN/LED_COUNT to match your strip if needed.
-constexpr int LED_PIN = 5;
-constexpr int LED_COUNT = 57;
-constexpr int LED_BRIGHTNESS = 200;
-

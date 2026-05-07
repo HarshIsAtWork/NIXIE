@@ -8,7 +8,6 @@
 #include "display_manager.h"
 #include "wav_server.h"
 #include "tasks.h"
-#include "led_manager.h"
 
 enum class AppState { Idle, Recording, Ready, Error };
 static AppState appState = AppState::Idle;
@@ -40,11 +39,9 @@ void timerBuzz(int pulses = 3, int onMs = 200, int offMs = 100) {
 void displayClockNow() {
   struct tm timeinfo;
   if (!getLocalTime(&timeinfo)) {
-    // if NTP not ready, show placeholder.
-    displayOledShowTimer(0); // or something
     return;
   }
-  displayOledShowTimer(timeinfo.tm_hour * 3600 + timeinfo.tm_min * 60 + timeinfo.tm_sec);
+  display7SegShowClock(timeinfo.tm_hour, timeinfo.tm_min);
 }
 
 void startRecording() {
@@ -66,8 +63,8 @@ void stopRecording() {
 
   float recordedSeconds = (millis() - recordingStartMs) / 1000.0f;
   Serial.printf("--- Recording stopped: %d samples (%.2f s) ---\n", sampleCount, recordedSeconds);
-  displaySetStatus(StatusState::Idle, "Ready");
-  wavServerAutoTranscribe();
+  displaySetStatus(StatusState::Sending, "Sending audio to servers");
+  wavServerRequestTranscription();
 }
 
 void ensureNetworkServer() {
@@ -85,9 +82,15 @@ void ensureNetworkServer() {
 }
 
 void connectWiFi() {
+  displayShowWifiConnecting(WIFI_SSID);
   wifiSetup();
   if (WiFi.status() == WL_CONNECTED) {
+    displayShowWifiResult(true, WiFi.localIP().toString());
     wavServerInit();
+    displaySetServiceStatus(wavServerIsRunning(), false);
+  } else {
+    displayShowWifiResult(false, "Check SSID/password");
+    displaySetServiceStatus(false, false);
   }
 }
 
@@ -96,11 +99,9 @@ void setup() {
   delay(100);
 
   displayInit();
-  ledInit();
   pinMode(BUZZER_PIN, OUTPUT);
   digitalWrite(BUZZER_PIN, LOW);
   displayBootAnimation();
-  displaySetStatus(StatusState::Idle, "Booting...");
 
   buttonSetup();
 
@@ -112,7 +113,7 @@ void setup() {
   }
 
   connectWiFi();
-  configTime(0, 0, "pool.ntp.org", "time.nist.gov");
+  configTime(19800, 0, "pool.ntp.org", "time.nist.gov");
   struct tm timeinfo;
   if (getLocalTime(&timeinfo, 15000)) {
     Serial.printf("NTP time sync: %04d-%02d-%02d %02d:%02d:%02d\n", timeinfo.tm_year + 1900, timeinfo.tm_mon + 1, timeinfo.tm_mday, timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec);
@@ -131,9 +132,38 @@ void setup() {
 
 void loop() {
   wavServerHandleClients();
-  ledUpdate();
 
   buttonUpdate();
+  displayUiTick();
+
+  if (joystickWasUp()) {
+    displayNavigateMenu(-1);
+    Serial.println("Joystick: up");
+  }
+
+  if (joystickWasDown()) {
+    displayNavigateMenu(1);
+    Serial.println("Joystick: down");
+  }
+
+  if (joystickWasLeft()) {
+    displayNavigateMenu(-1);
+    Serial.println("Joystick: left");
+  }
+
+  if (joystickWasRight()) {
+    displayNavigateMenu(1);
+    Serial.println("Joystick: right");
+  }
+
+  if (joystickButtonWasPressed()) {
+    displaySelectMenu();
+    Serial.println("Joystick: select");
+  }
+
+  if (joystickButtonWasReleased()) {
+    displayReleaseMenu();
+  }
 
   if (buttonWasPressed()) {
     startRecording();
@@ -161,6 +191,7 @@ void loop() {
   }
 
   if (appState != AppState::Recording) {
+    wavServerProcessPending();
     taskManager.loop();
 
     static unsigned long lastClockMs = 0;
